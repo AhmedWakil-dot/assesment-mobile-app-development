@@ -32,7 +32,11 @@ import {
   Battery,
   SignalMedium,
   Star,
-  Play
+  Play,
+  Trophy,
+  Zap,
+  Flame,
+  Award
 } from 'lucide-react';
 
 import { 
@@ -47,7 +51,18 @@ import {
 
 // --- Types ---
 type UserRole = 'student' | 'teacher';
-type Screen = 'login' | 'dashboard' | 'timetable' | 'map' | 'community' | 'attendance' | 'profile' | 'messages' | 'attendance_faculty' | 'tasks';
+type Screen = 'login' | 'dashboard' | 'timetable' | 'map' | 'community' | 'attendance' | 'profile' | 'messages' | 'attendance_faculty' | 'tasks' | 'leaderboard' | 'notifications';
+
+interface AppNotification {
+  id: number;
+  title: string;
+  desc: string;
+  time: string;
+  type: string;
+  icon: any;
+  color: string;
+  unread: boolean;
+}
 
 interface Message {
   id: string;
@@ -89,13 +104,15 @@ const Layout = ({
   title, 
   onMenuClick, 
   activeScreen, 
-  setScreen 
+  setScreen,
+  hasUnread
 }: { 
   children: React.ReactNode; 
   title: string; 
   onMenuClick: () => void;
   activeScreen: Screen;
   setScreen: (s: Screen) => void;
+  hasUnread: boolean;
 }) => (
   <div className="flex flex-col h-full bg-surface relative overflow-hidden">
     <StatusBar />
@@ -109,8 +126,14 @@ const Layout = ({
         <h1 className="font-bold text-lg text-indigo-dark">{title}</h1>
       </div>
       <div className="flex items-center gap-3">
-        <button className="p-2 hover:bg-white/30 rounded-full transition-colors">
+        <button 
+          onClick={() => setScreen('notifications')}
+          className={`p-2 hover:bg-white/30 rounded-full transition-colors relative ${activeScreen === 'notifications' ? 'bg-white/30' : ''}`}
+        >
           <Bell className="w-6 h-6 text-indigo-dark/60" />
+          {hasUnread && (
+            <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
+          )}
         </button>
         <div 
           onClick={() => setScreen('profile')}
@@ -133,8 +156,8 @@ const Layout = ({
     {/* Bottom Nav */}
     <nav className="absolute bottom-0 w-full bg-indigo-dark/95 backdrop-blur-xl border-t border-white/10 flex justify-around items-center px-4 py-3 pb-8 z-40 h-24">
       <NavItem icon={LayoutDashboard} active={activeScreen === 'dashboard'} onClick={() => setScreen('dashboard')} label="Home" />
+      <NavItem icon={Trophy} active={activeScreen === 'leaderboard'} onClick={() => setScreen('leaderboard')} label="Ranks" />
       <NavItem icon={Calendar} active={activeScreen === 'timetable'} onClick={() => setScreen('timetable')} label="Class" />
-      <NavItem icon={Compass} active={activeScreen === 'map'} onClick={() => setScreen('map')} label="Map" />
       <NavItem icon={Users} active={activeScreen === 'community'} onClick={() => setScreen('community')} label="Social" />
       <NavItem icon={User} active={activeScreen === 'profile'} onClick={() => setScreen('profile')} label="Profile" />
       
@@ -554,6 +577,51 @@ const AttendanceFacultyScreen = () => {
   );
 };
 
+const RewardCard = () => (
+  <div className="grid grid-cols-2 gap-4">
+    <div className="bg-[#050038] p-6 rounded-[2rem] relative overflow-hidden group cursor-pointer shadow-xl shadow-blue-900/10">
+      <div className="absolute -right-4 -top-4 w-20 h-20 bg-blue-500 rounded-full blur-2xl opacity-20 group-hover:scale-150 transition-transform duration-700"></div>
+      <div className="flex items-center gap-3 mb-4">
+        <div className="p-2 bg-blue-500/20 rounded-xl">
+          <Trophy className="w-5 h-5 text-blue-400" />
+        </div>
+        <span className="text-[10px] font-black text-blue-400 uppercase tracking-[0.2em]">Total XP</span>
+      </div>
+      <div className="flex items-end gap-1">
+        <span className="text-3xl font-black text-white italic">2,450</span>
+        <span className="text-[10px] font-black text-blue-400 mb-1.5">+50 Today</span>
+      </div>
+      <div className="mt-4 h-1.5 bg-white/10 rounded-full overflow-hidden">
+        <motion.div 
+          initial={{ width: 0 }}
+          animate={{ width: '65%' }}
+          className="h-full bg-blue-500 rounded-full shadow-[0_0_8px_rgba(59,130,246,0.5)]"
+        />
+      </div>
+      <p className="text-[9px] font-bold text-white/40 mt-2 uppercase tracking-widest">Level 12 • Explorer</p>
+    </div>
+
+    <div className="bg-white p-6 rounded-[2rem] border border-slate-100 relative overflow-hidden group cursor-pointer shadow-sm">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="p-2 bg-orange-50 rounded-xl">
+          <Flame className="w-5 h-5 text-orange-500" />
+        </div>
+        <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Streak</span>
+      </div>
+      <div className="flex items-end gap-2">
+        <span className="text-3xl font-black text-[#050038] italic">12</span>
+        <span className="text-[10px] font-black text-orange-500 mb-1.5 uppercase tracking-widest">Days</span>
+      </div>
+      <div className="mt-4 flex gap-1.5">
+        {[1, 2, 3, 4, 5].map((d) => (
+          <div key={d} className={`flex-1 h-3 rounded-md ${d <= 4 ? 'bg-orange-500' : 'bg-slate-100'}`} />
+        ))}
+      </div>
+      <p className="text-[9px] font-bold text-slate-400 mt-2 uppercase tracking-widest">Next Reward: 3 Days</p>
+    </div>
+  </div>
+);
+
 const Dashboard = ({ setScreen, role }: { setScreen: (s: Screen) => void, role: UserRole }) => {
   if (role === 'teacher') return <TeacherDashboard setScreen={setScreen} />;
 
@@ -564,6 +632,62 @@ const Dashboard = ({ setScreen, role }: { setScreen: (s: Screen) => void, role: 
       exit={{ opacity: 0, x: -20 }}
       className="p-4 space-y-6"
     >
+      {/* Rewards & Streaks */}
+      <RewardCard />
+
+      {/* Recommended for You */}
+      <section>
+         <div className="flex items-center justify-between px-2 mb-4">
+            <h3 className="font-black text-lg text-[#050038]">Daily Challenges</h3>
+            <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest">View All</span>
+         </div>
+         <div className="space-y-3">
+            {[
+              { title: "Early Bird", desc: "Check-in before 09:00 AM", reward: "+100 XP", icon: Clock },
+              { title: "Social Scholar", desc: "Post an update in Community", reward: "+20 XP", icon: MessageSquare }
+            ].map((challenge, i) => (
+              <div key={i} className="bg-white rounded-[2rem] p-6 border border-slate-50 shadow-sm flex items-center justify-between group hover:border-blue-100 transition-all cursor-pointer">
+                 <div className="flex items-center gap-4">
+                    <div className="p-3 bg-slate-50 rounded-2xl group-hover:bg-blue-50 transition-colors">
+                       <challenge.icon className="w-6 h-6 text-slate-400 group-hover:text-blue-500 transition-colors" />
+                    </div>
+                    <div>
+                       <h4 className="text-sm font-black text-[#050038]">{challenge.title}</h4>
+                       <p className="text-[10px] font-bold text-slate-400 mt-0.5">{challenge.desc}</p>
+                    </div>
+                 </div>
+                 <div className="text-right">
+                    <span className="text-[10px] font-black text-green-500 uppercase tracking-widest">{challenge.reward}</span>
+                 </div>
+              </div>
+            ))}
+         </div>
+      </section>
+
+      {/* Progress & Badges */}
+      <section className="bg-[#050038] rounded-[2.5rem] p-8 shadow-2xl relative overflow-hidden group">
+         <div className="absolute top-0 right-0 w-48 h-48 bg-blue-500 rounded-full blur-[100px] opacity-10"></div>
+         
+         <div className="flex items-center gap-4 mb-8">
+            <div className="p-4 bg-white/5 border border-white/10 rounded-2xl">
+               <Award className="w-6 h-6 text-blue-400" />
+            </div>
+            <div>
+               <h3 className="text-lg font-black text-white">Latest Achievement</h3>
+               <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mt-1">Perfect Attendance Week</p>
+            </div>
+         </div>
+
+         <div className="flex gap-4 mb-2">
+            {[1, 2, 3, 4].map((i) => (
+               <div key={i} className={`flex-1 aspect-square rounded-2xl border-2 flex items-center justify-center transition-all ${i <= 3 ? 'bg-white/10 border-blue-400/50 grayscale-0' : 'bg-white/5 border-white/10 grayscale opacity-40'}`}>
+                  <Star className={`w-6 h-6 ${i <= 3 ? 'text-blue-400 fill-blue-400' : 'text-white/20'}`} />
+               </div>
+            ))}
+         </div>
+         <p className="text-[9px] font-bold text-center text-white/40 uppercase tracking-[0.2em] mt-6">Collect 1 more star to unlock 'Campus Legend'</p>
+      </section>
+
       {/* Next Class Hero */}
       <div className="w-full bg-[#ef4444] rounded-3xl overflow-hidden relative shadow-xl shadow-red-500/30 group cursor-pointer active:scale-[0.99] transition-transform" onClick={() => setScreen('map')}>
         <div className="absolute -bottom-10 -right-10 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
@@ -921,43 +1045,257 @@ const CommunityScreen = ({ setScreen }: { setScreen: (s: Screen) => void }) => (
   </motion.div>
 );
 
-const AttendanceScreen = () => (
-  <motion.div 
-    initial={{ opacity: 0, scale: 0.95 }}
-    animate={{ opacity: 1, scale: 1 }}
-    className="p-6 h-full flex flex-col items-center"
-  >
-    <div className="text-center mb-12">
-      <h2 className="text-2xl font-bold text-indigo-dark">Live Attendance</h2>
-      <p className="text-slate-500">Advanced Software Architecture</p>
-    </div>
+const AttendanceScreen = ({ addNotification }: { addNotification: (n: Omit<AppNotification, 'id' | 'time' | 'unread'>) => void }) => {
+  const [scanned, setScanned] = useState(false);
 
-    <div className="bg-white p-12 rounded-[2rem] border border-slate-100 shadow-2xl relative mb-12 group">
-      <QrCode className="w-48 h-48 text-indigo-dark" />
-      <div className="absolute inset-0 bg-primary-container/5 rounded-[2rem] animate-pulse"></div>
-      
-      {/* Corner Brackets */}
-      <div className="absolute top-4 left-4 w-10 h-10 border-t-4 border-l-4 border-primary-container rounded-tl-xl"></div>
-      <div className="absolute top-4 right-4 w-10 h-10 border-t-4 border-r-4 border-primary-container rounded-tr-xl"></div>
-      <div className="absolute bottom-4 left-4 w-10 h-10 border-b-4 border-l-4 border-primary-container rounded-bl-xl"></div>
-      <div className="absolute bottom-4 right-4 w-10 h-10 border-b-4 border-r-4 border-primary-container rounded-br-xl"></div>
-    </div>
+  const handleScan = () => {
+    if (scanned) return;
+    setScanned(true);
+    addNotification({
+      title: 'Attendance Verified',
+      desc: 'You have been successfully checked into Advanced Software Architecture.',
+      type: 'attendance',
+      icon: CheckCircle2,
+      color: 'bg-green-50 text-green-600 border-green-100'
+    });
+    setTimeout(() => setScanned(false), 3000);
+  };
 
-    <div className="flex items-center gap-3 text-primary-container font-bold text-sm mb-4">
-      <Timer className="w-5 h-5 animate-spin-pulse" />
-      REGENERATING IN 42S
-    </div>
-    
-    <p className="text-center text-slate-400 text-sm max-w-[240px]">
-      Scan this code at the entrance of Hall B for instant attendance credit.
-    </p>
+  return (
+    <motion.div 
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="p-6 h-full flex flex-col items-center"
+    >
+      <div className="text-center mb-12">
+        <h2 className="text-2xl font-black text-[#050038] tracking-tight">Check-in Terminal</h2>
+        <p className="text-slate-500 font-bold uppercase text-[10px] tracking-[0.2em] mt-2">Advanced Software Architecture</p>
+      </div>
 
-    <div className="mt-auto w-full space-y-4">
-      <button className="w-full py-4 bg-indigo-dark text-white rounded-xl font-bold">Manual Entry If Failed</button>
-      <button className="w-full text-slate-400 font-bold text-sm">Issue with scanner?</button>
-    </div>
-  </motion.div>
-);
+      <div className="relative group">
+        <div 
+          onClick={handleScan}
+          className={`bg-white p-12 rounded-[3.5rem] border border-slate-100 shadow-2xl relative mb-12 transform transition-all cursor-pointer active:scale-95 ${scanned ? 'ring-8 ring-green-100 border-green-500' : 'hover:scale-[1.02]'}`}
+        >
+          <QrCode className={`w-48 h-48 transition-colors ${scanned ? 'text-green-500' : 'text-[#050038]'}`} />
+          
+          <AnimatePresence>
+            {scanned && (
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.5 }}
+                className="absolute inset-0 flex flex-col items-center justify-center bg-green-500/90 rounded-[3.5rem] text-white z-20"
+              >
+                <CheckCircle2 className="w-16 h-16 mb-2" />
+                <h3 className="text-xl font-black">Success!</h3>
+                <p className="text-sm font-bold opacity-90">+50 Activity Points</p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <div className="absolute inset-0 bg-blue-500/5 rounded-[3.5rem] animate-pulse"></div>
+          
+          {/* Corner Brackets */}
+          <div className={`absolute top-6 left-6 w-12 h-12 border-t-8 border-l-8 rounded-tl-[1.5rem] transition-colors ${scanned ? 'border-green-500' : 'border-blue-600'}`}></div>
+          <div className={`absolute top-6 right-6 w-12 h-12 border-t-8 border-r-8 rounded-tr-[1.5rem] transition-colors ${scanned ? 'border-green-500' : 'border-blue-600'}`}></div>
+          <div className={`absolute bottom-6 left-6 w-12 h-12 border-b-8 border-l-8 rounded-bl-[1.5rem] transition-colors ${scanned ? 'border-green-500' : 'border-blue-600'}`}></div>
+          <div className={`absolute bottom-6 right-6 w-12 h-12 border-b-8 border-r-8 rounded-br-[1.5rem] transition-colors ${scanned ? 'border-green-500' : 'border-blue-600'}`}></div>
+        </div>
+      </div>
+
+      <div className="flex flex-col items-center gap-4">
+        <div className="flex items-center gap-3 text-blue-600 font-black text-[10px] tracking-widest bg-blue-50 px-6 py-2 rounded-full border border-blue-100">
+          <Timer className="w-4 h-4" />
+          REFRESHING IN 14s
+        </div>
+        
+        <p className="text-[10px] font-bold text-slate-400 text-center uppercase tracking-widest leading-loose">
+           Points will be added to your profile<br />within 5 minutes of verification.
+        </p>
+      </div>
+    </motion.div>
+  );
+};
+
+const LeaderboardScreen = () => {
+  const [activeTab, setActiveTab] = useState<'xp' | 'social' | 'attendance'>('xp');
+
+  const categories = [
+    { id: 'xp', label: 'MOST XP', icon: Trophy, color: 'text-yellow-500' },
+    { id: 'social', label: 'SOCIAL', icon: MessageSquare, color: 'text-blue-500' },
+    { id: 'attendance', label: 'ATTENDANCE', icon: CheckCircle2, color: 'text-green-500' }
+  ];
+
+  const getLeaderboardData = () => {
+    const students = [
+      { name: 'Alex Johnson', value: activeTab === 'xp' ? '12,450 XP' : activeTab === 'social' ? '842 Posts' : '99%', avatar: 'https://picsum.photos/seed/alex/100/100' },
+      { name: 'Sarah Miller', value: activeTab === 'xp' ? '11,200 XP' : activeTab === 'social' ? '756 Posts' : '98%', avatar: 'https://picsum.photos/seed/sarah/100/100' },
+      { name: 'David Wilson', value: activeTab === 'xp' ? '10,800 XP' : activeTab === 'social' ? '689 Posts' : '98%', avatar: 'https://picsum.photos/seed/david/100/100' },
+      { name: 'Emily Brown', value: activeTab === 'xp' ? '9,450 XP' : activeTab === 'social' ? '542 Posts' : '96%', avatar: 'https://picsum.photos/seed/emily/100/100' },
+      { name: 'James Smith', value: activeTab === 'xp' ? '8,900 XP' : activeTab === 'social' ? '521 Posts' : '95%', avatar: 'https://picsum.photos/seed/james/100/100' },
+      { name: 'Olivia Taylor', value: activeTab === 'xp' ? '8,200 XP' : activeTab === 'social' ? '498 Posts' : '95%', avatar: 'https://picsum.photos/seed/olivia/100/100' },
+      { name: 'Noah Davis', value: activeTab === 'xp' ? '7,800 XP' : activeTab === 'social' ? '412 Posts' : '94%', avatar: 'https://picsum.photos/seed/noah/100/100' },
+      { name: 'Sophia Moore', value: activeTab === 'xp' ? '7,400 XP' : activeTab === 'social' ? '389 Posts' : '93%', avatar: 'https://picsum.photos/seed/sophia/100/100' },
+      { name: 'William Anderson', value: activeTab === 'xp' ? '7,100 XP' : activeTab === 'social' ? '356 Posts' : '92%', avatar: 'https://picsum.photos/seed/william/100/100' },
+      { name: 'Isabella Jackson', value: activeTab === 'xp' ? '6,800 XP' : activeTab === 'social' ? '312 Posts' : '91%', avatar: 'https://picsum.photos/seed/isabella/100/100' },
+    ];
+    return students;
+  };
+
+  return (
+    <motion.div 
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      className="pb-10"
+    >
+      {/* Categories Tabs */}
+      <div className="px-6 pt-6 flex gap-3 overflow-x-auto no-scrollbar pb-6">
+        {categories.map((cat) => (
+          <button
+            key={cat.id}
+            onClick={() => setActiveTab(cat.id as any)}
+            className={`flex items-center gap-2 px-6 py-3 rounded-full whitespace-nowrap transition-all border ${activeTab === cat.id ? 'bg-[#050038] text-white border-[#050038] shadow-lg' : 'bg-white text-slate-400 border-slate-100 hover:border-slate-300'}`}
+          >
+            <cat.icon className={`w-4 h-4 ${activeTab === cat.id ? 'text-white' : cat.color}`} />
+            <span className="text-xs font-black uppercase tracking-widest">{cat.label}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* Top 3 Podium */}
+      <div className="px-6 flex items-end justify-center gap-2 mb-10 pt-4">
+        {/* 2nd Place */}
+        <div className="flex flex-col items-center flex-1">
+          <div className="relative mb-3">
+             <img src={getLeaderboardData()[1].avatar} className="w-16 h-16 rounded-full border-4 border-slate-200" />
+             <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-slate-200 text-[#050038] text-[8px] font-black w-5 h-5 rounded-full flex items-center justify-center">2</div>
+          </div>
+          <p className="text-[10px] font-black text-[#050038] text-center line-clamp-1">{getLeaderboardData()[1].name}</p>
+          <p className="text-[9px] font-bold text-blue-600 mt-1">{getLeaderboardData()[1].value}</p>
+        </div>
+
+        {/* 1st Place */}
+        <div className="flex flex-col items-center flex-1 -translate-y-4">
+          <div className="relative mb-3">
+             <div className="absolute -top-6 left-1/2 -translate-x-1/2">
+                <Trophy className="w-8 h-8 text-yellow-500 drop-shadow-lg" />
+             </div>
+             <img src={getLeaderboardData()[0].avatar} className="w-20 h-20 rounded-full border-4 border-yellow-400" />
+             <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-yellow-400 text-[#050038] text-[10px] font-black w-6 h-6 rounded-full flex items-center justify-center">1</div>
+          </div>
+          <p className="text-xs font-black text-[#050038] text-center line-clamp-1">{getLeaderboardData()[0].name}</p>
+          <p className="text-[10px] font-black text-blue-600 mt-1">{getLeaderboardData()[0].value}</p>
+        </div>
+
+        {/* 3rd Place */}
+        <div className="flex flex-col items-center flex-1">
+          <div className="relative mb-3">
+             <img src={getLeaderboardData()[2].avatar} className="w-14 h-14 rounded-full border-4 border-orange-200" />
+             <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-orange-200 text-[#050038] text-[8px] font-black w-5 h-5 rounded-full flex items-center justify-center">3</div>
+          </div>
+          <p className="text-[10px] font-black text-[#050038] text-center line-clamp-1">{getLeaderboardData()[2].name}</p>
+          <p className="text-[9px] font-bold text-blue-600 mt-1">{getLeaderboardData()[2].value}</p>
+        </div>
+      </div>
+
+      {/* List */}
+      <div className="px-6 space-y-3">
+        <div className="flex justify-between items-center px-4 mb-2">
+           <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Rank & Name</span>
+           <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Score</span>
+        </div>
+        {getLeaderboardData().slice(3).map((student, i) => (
+          <div key={i} className="flex items-center gap-4 bg-white p-4 rounded-2xl border border-slate-50 shadow-sm hover:border-blue-100 transition-all group">
+            <span className="text-xs font-black text-slate-300 w-4">{i + 4}</span>
+            <img src={student.avatar} className="w-10 h-10 rounded-full grayscale group-hover:grayscale-0 transition-all border border-slate-100" />
+            <div className="flex-1">
+              <h4 className="text-sm font-black text-[#050038]">{student.name}</h4>
+              <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Weekly Gain: +{Math.floor(Math.random() * 100)}</p>
+            </div>
+            <span className="text-[11px] font-black text-[#050038] bg-slate-50 px-3 py-1.5 rounded-full group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors">{student.value}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Weekly Update Footer */}
+      <div className="px-6 mt-10">
+         <div className="bg-[#f8fafc] border border-dashed border-slate-200 p-6 rounded-[2rem] text-center">
+            <Clock className="w-6 h-6 text-slate-400 mx-auto mb-2" />
+            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-relaxed">
+               Next weekly update in:<br />
+               <span className="text-blue-600">4 days, 12 hours, 45 minutes</span>
+            </p>
+         </div>
+      </div>
+    </motion.div>
+  );
+};
+
+const NotificationsScreen = ({ 
+  notifications, 
+  markAllAsRead 
+}: { 
+  notifications: AppNotification[], 
+  markAllAsRead: () => void 
+}) => {
+  return (
+    <motion.div 
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="p-6 space-y-4"
+    >
+      <div className="flex justify-between items-center mb-2">
+        <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Recent Notifications</h3>
+        <button 
+          onClick={markAllAsRead}
+          className="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:opacity-70"
+        >
+          Mark all as read
+        </button>
+      </div>
+
+      <div className="space-y-3">
+        {notifications.length === 0 ? (
+          <div className="py-20 text-center">
+            <Bell className="w-12 h-12 text-slate-200 mx-auto mb-4" />
+            <p className="text-slate-400 text-xs font-bold">Nothing to see here yet!</p>
+          </div>
+        ) : (
+          notifications.map((notif) => (
+            <div 
+              key={notif.id}
+              className={`p-5 rounded-[2rem] border shadow-sm flex gap-4 group active:scale-[0.98] transition-all relative ${notif.unread ? 'bg-white border-blue-100' : 'bg-slate-50/50 border-slate-50'}`}
+            >
+              <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 border ${notif.color}`}>
+                <notif.icon className="w-6 h-6" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex justify-between items-start mb-1">
+                  <h4 className="font-black text-[#050038] text-sm truncate">{notif.title}</h4>
+                  <span className="text-[10px] font-bold text-slate-400 whitespace-nowrap ml-2">{notif.time}</span>
+                </div>
+                <p className="text-xs text-slate-500 leading-relaxed font-medium line-clamp-2">
+                  {notif.desc}
+                </p>
+              </div>
+              {notif.unread && (
+                <div className="absolute top-4 right-4 w-1.5 h-1.5 bg-blue-600 rounded-full"></div>
+              )}
+            </div>
+          ))
+        )}
+      </div>
+
+      {notifications.length > 0 && (
+        <div className="pt-10 flex flex-col items-center">
+          <div className="w-1.5 h-1.5 bg-slate-200 rounded-full mb-12"></div>
+          <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.3em]">No more notifications</p>
+        </div>
+      )}
+    </motion.div>
+  );
+};
 
 const ProfileScreen = () => (
   <motion.div 
@@ -1003,12 +1341,65 @@ export default function App() {
   const [screen, setScreen] = useState<Screen>('login');
   const [role, setRole] = useState<UserRole>('student');
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [notifications, setNotifications] = useState<AppNotification[]>([
+    {
+      id: 1,
+      title: 'Rank Achievement!',
+      desc: 'You just climbed to 3rd place in the XP Leaderboard. Keep it up!',
+      time: '2m ago',
+      type: 'achievement',
+      icon: Trophy,
+      color: 'bg-yellow-50 text-yellow-600 border-yellow-100',
+      unread: true
+    },
+    {
+      id: 2,
+      title: 'Class Reminder',
+      desc: 'Mobile App Design starts in 15 minutes at MediaCity B104.',
+      time: '15m ago',
+      type: 'academic',
+      icon: Clock,
+      color: 'bg-blue-50 text-blue-600 border-blue-100',
+      unread: true
+    },
+    {
+      id: 3,
+      title: 'Community Reply',
+      desc: 'Sarah Miller replied to your post: "Does anyone want to study?"',
+      time: '1h ago',
+      type: 'social',
+      icon: MessageSquare,
+      color: 'bg-indigo-50 text-indigo-600 border-indigo-100',
+      unread: false
+    }
+  ]);
+  const [toast, setToast] = useState<AppNotification | null>(null);
+
+  const addNotification = (notif: Omit<AppNotification, 'id' | 'time' | 'unread'>) => {
+    const newNotif: AppNotification = {
+      ...notif,
+      id: Date.now(),
+      time: 'Just now',
+      unread: true
+    };
+    setNotifications(prev => [newNotif, ...prev]);
+    setToast(newNotif);
+    setTimeout(() => setToast(null), 4000);
+  };
+
+  const markAllAsRead = () => {
+    setNotifications(prev => prev.map(n => ({ ...n, unread: false })));
+  };
+
+  const hasUnread = notifications.some(n => n.unread);
 
   const getTitle = () => {
     switch (screen) {
       case 'dashboard': return 'Dashboard';
       case 'timetable': return role === 'teacher' ? 'Teaching Schedule' : 'Timetable';
       case 'map': return 'Campus Map';
+      case 'leaderboard': return 'Leaderboard';
+      case 'notifications': return 'Notifications';
       case 'community': return 'Community';
       case 'attendance': return 'Attendance';
       case 'profile': return 'My Profile';
@@ -1022,8 +1413,10 @@ export default function App() {
       case 'dashboard': return <Dashboard setScreen={setScreen} role={role} />;
       case 'timetable': return <TimetableScreen />;
       case 'map': return <MapScreen />;
+      case 'leaderboard': return <LeaderboardScreen />;
+      case 'notifications': return <NotificationsScreen notifications={notifications} markAllAsRead={markAllAsRead} />;
       case 'community': return <CommunityScreen setScreen={setScreen} />;
-      case 'attendance': return <AttendanceScreen />;
+      case 'attendance': return <AttendanceScreen addNotification={addNotification} />;
       case 'attendance_faculty': return <AttendanceFacultyScreen />;
       case 'profile': return <ProfileScreen />;
       case 'messages': return <MessageBoardScreen role={role} />;
@@ -1088,6 +1481,7 @@ export default function App() {
             <div className="bg-blue-600 text-white px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-[0.2em] mb-4 w-fit shadow-lg shadow-blue-500/20">Faculty</div>
             <div className="flex flex-col gap-6">
               <DrawerItem icon={LayoutDashboard} label="Dashboard" active={screen === 'dashboard'} onClick={() => { setScreen('dashboard'); setDrawerOpen(false); }} />
+              <DrawerItem icon={Trophy} label="Leaderboard" active={screen === 'leaderboard'} onClick={() => { setScreen('leaderboard'); setDrawerOpen(false); }} />
               <DrawerItem icon={School} label="Library" active={false} onClick={() => setDrawerOpen(false)} />
               <DrawerItem icon={MapPin} label="Campus Map" active={screen === 'map'} onClick={() => { setScreen('map'); setDrawerOpen(false); }} />
               <DrawerItem icon={Star} label="Financials" active={false} onClick={() => setDrawerOpen(false)} />
@@ -1112,6 +1506,7 @@ export default function App() {
             setScreen={setScreen} 
             title={getTitle()} 
             onMenuClick={() => setDrawerOpen(true)}
+            hasUnread={hasUnread}
           >
             <AnimatePresence mode="wait">
               <motion.div
@@ -1124,6 +1519,28 @@ export default function App() {
               >
                 {renderScreen()}
               </motion.div>
+            </AnimatePresence>
+
+            {/* Toast System */}
+            <AnimatePresence>
+              {toast && (
+                <motion.div
+                  initial={{ opacity: 0, y: -50, scale: 0.9 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -20, scale: 0.9 }}
+                  onClick={() => { setScreen('notifications'); setToast(null); }}
+                  className="absolute top-28 left-6 right-6 z-[100] bg-indigo-dark text-white p-4 rounded-3xl shadow-2xl border border-white/10 flex items-center gap-4 cursor-pointer active:scale-95 transition-transform"
+                >
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border ${toast.color}`}>
+                    <toast.icon className="w-5 h-5" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h5 className="font-black text-xs">{toast.title}</h5>
+                    <p className="text-[10px] opacity-70 truncate font-medium">{toast.desc}</p>
+                  </div>
+                  <ChevronRight className="w-4 h-4 opacity-40" />
+                </motion.div>
+              )}
             </AnimatePresence>
           </Layout>
         </div>
