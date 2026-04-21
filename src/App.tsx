@@ -75,6 +75,60 @@ interface Message {
   role?: string;
 }
 
+// --- Constants & Data ---
+
+const CAMPUS_LOCATIONS: Record<string, { x: string; y: string; name: string; building: string }> = {
+  'Hall B': { x: '35%', y: '25%', name: 'Main Hall B', building: 'Block A' },
+  'Hall A': { x: '55%', y: '45%', name: 'Lecture Theatre A', building: 'Block B' },
+  'Lab 402': { x: '25%', y: '65%', name: 'Software Lab 402', building: 'Computing Wing' },
+  'MediaCity B104': { x: '65%', y: '15%', name: 'Studio B104', building: 'MediaCityUK' },
+  'Main Library': { x: '45%', y: '75%', name: 'University Library', building: 'Building A' },
+  'Hall B7': { x: '50%', y: '40%', name: 'Seminar Room B7', building: 'Block C' },
+};
+
+const STUDENT_SCHEDULE = [
+  { 
+    id: 1, 
+    title: 'Computational Mathematics', 
+    time: '08:00 AM', 
+    duration: '2h', 
+    location: 'Hall B',
+    color: '#ef4444',
+    type: 'Lecture',
+    day: 'Monday'
+  },
+  { 
+    id: 2, 
+    title: 'Advanced Architecture', 
+    time: '10:00 AM', 
+    duration: '2h', 
+    location: 'Hall B7',
+    color: '#ef4444',
+    type: 'Lecture',
+    day: 'Monday'
+  },
+  { 
+    id: 3, 
+    title: 'Software Lab', 
+    time: '12:00 PM', 
+    duration: '1.5h', 
+    location: 'Lab 402',
+    color: '#3b82f6',
+    type: 'Workshop',
+    day: 'Monday'
+  },
+  { 
+    id: 4, 
+    title: 'UX Design Lab', 
+    time: '02:00 PM', 
+    duration: '3h', 
+    location: 'Hall B7',
+    color: '#8b5cf6',
+    type: 'Lab',
+    day: 'Monday'
+  }
+];
+
 // --- Components ---
 
 const StatusBar = () => {
@@ -149,7 +203,7 @@ const Layout = ({
     </header>
 
     {/* Content */}
-    <main className="flex-1 overflow-y-auto mt-24 pb-24 px-2">
+    <main className={`flex-1 ${activeScreen === 'map' ? 'overflow-hidden' : 'overflow-y-auto px-2'} mt-24 pb-24`}>
       {children}
     </main>
 
@@ -911,89 +965,231 @@ const TimetableScreen = () => (
     <div className="flex items-center justify-between mb-4">
       <div>
         <span className="text-[10px] font-bold text-primary-container uppercase tracking-widest">Schedule</span>
-        <h2 className="text-2xl font-bold text-indigo-dark">Monday, Oct 23</h2>
+        <h2 className="text-2xl font-bold text-indigo-dark tracking-tight">Monday, Oct 23</h2>
       </div>
       <div className="flex gap-2">
-        <button className="p-2 border border-white/40 bg-white/40 backdrop-blur-sm rounded-xl hover:bg-white/60 transition-colors"><ArrowLeft className="w-5 h-5 text-indigo-dark/60" /></button>
-        <button className="p-2 border border-white/40 bg-white/40 backdrop-blur-sm rounded-xl hover:bg-white/60 transition-colors"><ChevronRight className="w-5 h-5 text-indigo-dark/60" /></button>
+        <button className="p-2 border border-slate-100 bg-white rounded-xl hover:bg-slate-50 transition-colors shadow-sm"><ArrowLeft className="w-5 h-5 text-indigo-dark/60" /></button>
+        <button className="p-2 border border-slate-100 bg-white rounded-xl hover:bg-slate-50 transition-colors shadow-sm"><ChevronRight className="w-5 h-5 text-indigo-dark/60" /></button>
       </div>
     </div>
 
     <div className="space-y-4">
-      {[1, 2, 3].map((i) => (
-        <div key={i} className="flex gap-4">
-          <div className="w-16 text-right pt-4">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{8 + i*2}:00 AM</span>
+      {STUDENT_SCHEDULE.map((item, i) => (
+        <div key={item.id} className="flex gap-4">
+          <div className="w-16 text-right pt-4 shrink-0">
+            <span className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">{item.time}</span>
           </div>
-          <div className="relative flex-1 bg-white rounded-3xl p-6 shadow-xl border border-slate-50 overflow-hidden">
-            <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#ef4444]"></div>
-            <span className="text-[10px] font-bold text-[#ef4444] uppercase mb-1 block tracking-wider">Lecture</span>
-            <h4 className="font-bold text-indigo-dark mb-3 text-lg leading-tight">Computational Mathematics</h4>
-            <div className="flex items-center gap-4 text-slate-500 text-xs font-semibold">
-              <span className="flex items-center gap-1.5"><DoorOpen className="w-3.5 h-3.5" /> Hall B</span>
-              <span className="flex items-center gap-1.5"><Timer className="w-3.5 h-3.5" /> 2h</span>
+          <div className="relative flex-1 bg-white rounded-3xl p-6 shadow-xl border border-slate-50 overflow-hidden group hover:border-blue-100 transition-all">
+            <div className={`absolute left-0 top-0 bottom-0 w-1.5`} style={{ backgroundColor: item.color }}></div>
+            <div className="flex justify-between items-start mb-1">
+              <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: item.color }}>{item.type}</span>
+              <span className="text-[10px] font-bold text-slate-300">Room Confirmed</span>
+            </div>
+            <h4 className="font-black text-indigo-dark mb-3 text-lg leading-tight tracking-tight">{item.title}</h4>
+            <div className="flex items-center gap-4 text-slate-500 text-[10px] font-bold uppercase tracking-widest">
+              <span className="flex items-center gap-1.5"><DoorOpen className="w-3.5 h-3.5" /> {item.location}</span>
+              <span className="flex items-center gap-1.5"><Timer className="w-3.5 h-3.5" /> {item.duration}</span>
             </div>
           </div>
         </div>
       ))}
+    </div>
+    
+    <div className="pt-10 flex flex-col items-center opacity-30">
+       <div className="w-1 h-32 bg-gradient-to-b from-slate-200 to-transparent rounded-full"></div>
     </div>
   </motion.div>
 );
 
 const MapScreen = () => {
   const [searching, setSearching] = useState(false);
+  const [selectedClass, setSelectedClass] = useState<typeof STUDENT_SCHEDULE[0] | null>(STUDENT_SCHEDULE[1]); // Default to next class
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredSchedule = STUDENT_SCHEDULE.filter(s => 
+    s.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    s.location.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
-    <div className="h-full flex flex-col">
-      <div className="p-4 glass border-b border-white/20 shrink-0 z-10">
-        <div className={`flex items-center gap-3 p-3 bg-white/50 backdrop-blur-md rounded-2xl border transition-all ${searching ? 'border-primary-container ring-1 ring-primary-container' : 'border-white/40'}`}>
+    <div className="h-full relative overflow-hidden bg-[#d0dbe8]">
+      {/* Floating Search Bar */}
+      <div className="absolute top-6 left-6 right-6 z-30">
+        <div className={`flex items-center gap-3 p-4 bg-white/90 backdrop-blur-xl rounded-2xl border transition-all shadow-2xl ${searching ? 'border-blue-600 ring-2 ring-blue-500/10' : 'border-white/20'}`}>
           <Search className="w-5 h-5 text-indigo-dark/40" />
           <input 
             onFocus={() => setSearching(true)}
-            onBlur={() => setSearching(false)}
-            className="bg-transparent border-none outline-none flex-1 text-sm text-indigo-dark placeholder:text-indigo-dark/30" 
-            placeholder="Search campus architecture..."
+            onBlur={() => setTimeout(() => setSearching(false), 300)}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="bg-transparent border-none outline-none flex-1 text-sm text-indigo-dark font-black placeholder:text-indigo-dark/30" 
+            placeholder="Find buildings, labs, or classes..."
           />
         </div>
-      </div>
-      <div className="flex-1 relative bg-slate-200 overflow-hidden">
-        <img src="https://picsum.photos/seed/map/1000/1000" className="w-full h-full object-cover opacity-60 grayscale scale-110" />
         
-        {/* Highlighted Building */}
-        <motion.div 
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center"
-        >
-          <div className="bg-[#ef4444] text-white p-4 rounded-2xl shadow-2xl relative border-2 border-white">
-            <School className="w-8 h-8" />
-            <div className="absolute inset-0 animate-ping bg-[#ef4444] rounded-2xl opacity-30"></div>
-          </div>
-          <div className="mt-3 glass px-4 py-2 rounded-xl whitespace-nowrap shadow-xl text-indigo-dark font-bold text-xs">
-            BLOCK C • UX DESIGN LAB
-          </div>
-        </motion.div>
-
-        {/* Search Result Overlay */}
+        {/* Floating Search Results */}
         <AnimatePresence>
           {searching && (
             <motion.div 
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 10 }}
-              className="absolute top-4 left-4 right-4 glass p-5 rounded-3xl shadow-2xl border border-white/40 z-50"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="absolute top-2 w-full bg-white/95 backdrop-blur-2xl rounded-[2.5rem] border border-white shadow-2xl p-6 z-50 mt-16 max-h-[400px] overflow-hidden flex flex-col"
             >
-              <p className="text-[10px] font-bold text-[#ef4444] mb-1 uppercase tracking-widest">Closest Match</p>
-              <h4 className="font-bold text-indigo-dark text-lg leading-tight">Main Library (Building A)</h4>
-              <p className="text-xs text-slate-500 mt-1 font-medium">2 mins walk • Crowded right now</p>
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 px-2">
+                {searchQuery ? 'Matches in your schedule' : 'Your Schedule Today'}
+              </p>
+              <div className="space-y-2 overflow-y-auto pr-2 no-scrollbar">
+                {(searchQuery ? filteredSchedule : STUDENT_SCHEDULE).map(s => (
+                  <div 
+                    key={s.id} 
+                    onClick={() => { setSelectedClass(s); setSearchQuery(''); setSearching(false); }}
+                    className="p-4 hover:bg-blue-50 bg-slate-50/50 rounded-2xl flex items-center justify-between cursor-pointer group transition-all"
+                  >
+                    <div className="flex items-center gap-4">
+                       <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm">
+                          {s.type === 'Lecture' ? <School className="w-5 h-5 text-blue-600" /> : <Timer className="w-5 h-5 text-blue-600" />}
+                       </div>
+                       <div>
+                         <h4 className="text-xs font-black text-[#050038] group-hover:text-blue-600">{s.title}</h4>
+                         <p className="text-[9px] font-bold text-slate-400 mt-0.5 uppercase tracking-widest">{s.location} • {s.time}</p>
+                       </div>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-slate-300 transition-transform group-hover:translate-x-1" />
+                  </div>
+                ))}
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
+      </div>
 
-        <button className="absolute bottom-8 right-8 p-5 bg-[#ef4444] rounded-2xl shadow-2xl text-white active:scale-95 transition-transform border-2 border-white">
-          <MapPin className="w-7 h-7" />
+      {/* Main Map Background */}
+      <div className="absolute inset-0 grayscale contrast-125 opacity-60 scale-110">
+        <img 
+          src="https://picsum.photos/seed/salford_map_dark/1200/1200" 
+          className="w-full h-full object-cover" 
+          referrerPolicy="no-referrer"
+        />
+      </div>
+
+      {/* Dynamic Class Specific Markers */}
+      <div className="absolute inset-0 pointer-events-none">
+        <AnimatePresence>
+          {STUDENT_SCHEDULE.map((item) => {
+            const loc = CAMPUS_LOCATIONS[item.location];
+            if (!loc) return null;
+            const isSelected = selectedClass?.id === item.id;
+            
+            return (
+              <motion.div
+                key={item.id}
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ 
+                  scale: isSelected ? 1.1 : 1, 
+                  opacity: isSelected ? 1 : 0.7,
+                  zIndex: isSelected ? 30 : 10
+                }}
+                style={{ left: loc.x, top: loc.y }}
+                className="absolute -translate-x-1/2 -translate-y-1/2 pointer-events-auto flex flex-col items-center"
+              >
+                {/* Popover ABOVE icon */}
+                {isSelected && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10, scale: 0.9 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    className="mb-3 bg-indigo-dark text-white px-5 py-3 rounded-2xl whitespace-nowrap shadow-2xl relative border border-white/10"
+                  >
+                    <div className="flex flex-col items-start min-w-[120px]">
+                      <span className="text-[8px] font-black text-blue-400 uppercase tracking-widest mb-0.5">{item.type} • {item.time}</span>
+                      <h4 className="text-sm font-black tracking-tight">{item.title}</h4>
+                    </div>
+                    <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-indigo-dark rotate-45 border-r border-b border-white/10"></div>
+                  </motion.div>
+                )}
+
+                <div 
+                  onClick={() => setSelectedClass(item)}
+                  className={`p-3 rounded-2xl shadow-xl border-2 transition-all duration-500 cursor-pointer ${isSelected ? 'bg-blue-600 border-white scale-110' : 'bg-white border-white/20 hover:border-blue-300'}`}
+                >
+                  {item.type === 'Lecture' ? <School className={`w-6 h-6 ${isSelected ? 'text-white' : 'text-blue-600'}`} /> : <Timer className={`w-6 h-6 ${isSelected ? 'text-white' : 'text-blue-600'}`} />}
+                  {isSelected && <div className="absolute inset-0 animate-ping bg-blue-600 rounded-2xl opacity-20"></div>}
+                </div>
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
+      </div>
+
+      {/* Campus Controls */}
+      <div className="absolute top-28 right-6 flex flex-col gap-3">
+        <button className="p-4 bg-white/90 backdrop-blur-md rounded-2xl shadow-xl text-indigo-dark active:scale-[0.85] transition-all border border-white hover:bg-white">
+          <Compass className="w-6 h-6" />
+        </button>
+        <button className="p-4 bg-white/90 backdrop-blur-md rounded-2xl shadow-xl text-indigo-dark active:scale-[0.85] transition-all border border-white hover:bg-white">
+          <Wifi className="w-6 h-6" />
         </button>
       </div>
+
+      {/* Navigation Detail Card */}
+      <AnimatePresence>
+        {selectedClass && (
+           <motion.div 
+             initial={{ y: 300 }}
+             animate={{ y: 0 }}
+             exit={{ y: 300 }}
+             className="absolute bottom-6 left-6 right-6 bg-indigo-dark text-white p-6 rounded-[2.5rem] shadow-2xl border border-white/10 z-40"
+           >
+              <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600 rounded-full blur-[100px] opacity-10"></div>
+              
+              <div className="relative z-10">
+                <div className="flex justify-between items-start mb-6">
+                  <div className="flex items-center gap-3">
+                     <div className="p-3 bg-blue-600 text-white rounded-2xl shadow-lg shadow-blue-500/20">
+                        {selectedClass.type === 'Lecture' ? <School className="w-6 h-6" /> : <Timer className="w-6 h-6" />}
+                     </div>
+                     <div>
+                        <span className="text-[9px] font-black text-blue-400 uppercase tracking-[0.2em]">{selectedClass.type} Room</span>
+                        <h3 className="text-xl font-black tracking-tight mt-0.5 line-clamp-1">{selectedClass.title}</h3>
+                     </div>
+                  </div>
+                  <button onClick={() => setSelectedClass(null)} className="p-2 bg-white/5 rounded-full hover:bg-white/10 transition-colors">
+                    <X className="w-5 h-5 text-white/40" />
+                  </button>
+                </div>
+
+                <div className="flex items-center gap-4 mb-8">
+                  <div className="flex-1 bg-white/5 p-4 rounded-2xl border border-white/5">
+                    <span className="text-[8px] font-black text-white/20 uppercase tracking-widest block mb-2">Location</span>
+                    <p className="text-xs font-bold text-white uppercase tracking-tight">{selectedClass.location}</p>
+                    <p className="text-[9px] text-blue-400 font-bold mt-1 uppercase mt-1 tracking-widest">{CAMPUS_LOCATIONS[selectedClass.location]?.building}</p>
+                  </div>
+                  <div className="flex-1 bg-white/5 p-4 rounded-2xl border border-white/5">
+                    <span className="text-[8px] font-black text-white/20 uppercase tracking-widest block mb-2">Time</span>
+                    <p className="text-xs font-bold text-white uppercase tracking-tight">{selectedClass.time}</p>
+                    <p className="text-[9px] text-green-400 font-bold mt-1 uppercase tracking-widest animate-pulse">Class Live</p>
+                  </div>
+                </div>
+
+                <div className="flex gap-3">
+                  <button className="flex-1 py-4 bg-blue-600 text-white font-black rounded-2xl active:scale-95 transition-transform flex items-center justify-center gap-3 shadow-xl shadow-blue-600/20 border border-blue-500">
+                     <Compass className="w-5 h-5" />
+                     <span className="text-xs uppercase tracking-widest">AR Mode</span>
+                  </button>
+                  <button className="p-4 bg-white/10 text-white rounded-2xl hover:bg-white/20 transition-colors border border-white/10">
+                     <MessageSquare className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {!selectedClass && !searching && (
+        <button className="absolute bottom-10 right-10 p-6 bg-blue-600 rounded-[2.2rem] shadow-2xl shadow-blue-600/30 text-white active:scale-[0.85] transition-all border-4 border-white z-20">
+          <MapPin className="w-8 h-8" />
+        </button>
+      )}
     </div>
   );
 };
