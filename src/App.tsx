@@ -49,7 +49,7 @@ const StatusBar = () => {
   }, []);
 
   return (
-    <div className="flex justify-between items-center px-6 py-2 h-10 w-full z-50 fixed top-0 pointer-events-none select-none">
+    <div className="flex justify-between items-center px-6 py-2 h-10 w-full z-50 absolute top-0 pointer-events-none select-none">
       <div className="text-[12px] font-bold text-on-surface-variant">{time}</div>
       <div className="flex items-center gap-1.5 text-on-surface-variant">
         <SignalMedium className="w-3.5 h-3.5" />
@@ -77,7 +77,7 @@ const Layout = ({
     <StatusBar />
     
     {/* Header */}
-    <header className="sticky top-0 w-full z-40 glass border-b border-white/20 flex justify-between items-center px-4 py-4 pt-10 h-24 shrink-0 shadow-sm">
+    <header className="absolute top-0 w-full z-40 glass border-b border-white/20 flex justify-between items-center px-4 py-4 pt-10 h-24 shrink-0 shadow-sm">
       <div className="flex items-center gap-3">
         <button onClick={onMenuClick} className="p-2 hover:bg-white/30 rounded-full active:opacity-70 transition-colors">
           <Menu className="w-6 h-6 text-indigo-dark" />
@@ -102,12 +102,12 @@ const Layout = ({
     </header>
 
     {/* Content */}
-    <main className="flex-1 overflow-y-auto pb-24 px-2">
+    <main className="flex-1 overflow-y-auto mt-24 pb-24 px-2">
       {children}
     </main>
 
     {/* Bottom Nav */}
-    <nav className="fixed bottom-0 w-full bg-indigo-dark/95 backdrop-blur-xl border-t border-white/10 flex justify-around items-center px-4 py-3 pb-8 z-40 h-24">
+    <nav className="absolute bottom-0 w-full bg-indigo-dark/95 backdrop-blur-xl border-t border-white/10 flex justify-around items-center px-4 py-3 pb-8 z-40 h-24">
       <NavItem icon={LayoutDashboard} active={activeScreen === 'dashboard'} onClick={() => setScreen('dashboard')} label="Home" />
       <NavItem icon={Calendar} active={activeScreen === 'timetable'} onClick={() => setScreen('timetable')} label="Class" />
       <NavItem icon={Compass} active={activeScreen === 'map'} onClick={() => setScreen('map')} label="Map" />
@@ -559,103 +559,109 @@ export default function App() {
   };
 
   if (screen === 'login') return (
-    <div className="relative p-8">
-      <div className="w-[430px] h-[932px] bg-slate-900 overflow-hidden relative shadow-2xl border-[12px] border-slate-800 rounded-[3.5rem] device-shell">
-        {/* Dynamic Island Notch */}
-        <div className="absolute top-3 left-1/2 -translate-x-1/2 w-[120px] h-9 bg-black rounded-[1.2rem] z-50 flex items-center justify-end px-4">
-          <div className="w-2.5 h-2.5 bg-[#1a1a1a] rounded-full shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)]"></div>
+    <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="relative scale-90 sm:scale-100 origin-center">
+        <div className="w-[393px] h-[852px] bg-slate-900 overflow-hidden relative shadow-2xl border-[10px] border-slate-800 rounded-[3.5rem] device-shell">
+          {/* Dynamic Island Notch */}
+          <div className="absolute top-3 left-1/2 -translate-x-1/2 w-[120px] h-9 bg-black rounded-[1.2rem] z-50 flex items-center justify-end px-4">
+            <div className="w-2.5 h-2.5 bg-[#1a1a1a] rounded-full shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)]"></div>
+          </div>
+          
+          <StatusBar />
+          <div className="h-full pt-10">
+            <LoginScreen onLogin={() => setScreen('dashboard')} />
+          </div>
+
+          {/* Home Indicator */}
+          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-32 h-1.5 bg-black/10 rounded-full z-50"></div>
         </div>
         
-        <StatusBar />
-        <div className="h-full pt-10">
-          <LoginScreen onLogin={() => setScreen('dashboard')} />
-        </div>
-
-        {/* Home Indicator */}
-        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-32 h-1.5 bg-black/10 rounded-full z-50"></div>
+        {/* Physical Buttons Simulation */}
+        <div className="absolute top-32 -left-3 w-1.5 h-8 bg-slate-800 rounded-r shadow-sm"></div>
+        <div className="absolute top-48 -left-3 w-1.5 h-16 bg-slate-800 rounded-r shadow-sm"></div>
+        <div className="absolute top-68 -left-3 w-1.5 h-16 bg-slate-800 rounded-r shadow-sm"></div>
+        <div className="absolute top-48 -right-3 w-1.5 h-24 bg-slate-800 rounded-l shadow-sm"></div>
       </div>
-      
-      {/* Physical Buttons Simulation */}
-      <div className="absolute top-48 -left-3 w-1.5 h-16 bg-slate-800 rounded-r shadow-sm"></div>
-      <div className="absolute top-72 -left-3 w-1.5 h-24 bg-slate-800 rounded-r shadow-sm"></div>
-      <div className="absolute top-72 -right-3 w-1.5 h-24 bg-slate-800 rounded-l shadow-sm"></div>
     </div>
   );
 
   return (
-    <div className="relative p-8 scale-95 origin-center">
-      <div className="w-[430px] h-[932px] bg-slate-900 overflow-hidden relative shadow-2xl border-[12px] border-slate-800 rounded-[3.5rem] device-shell">
-        {/* Dynamic Island Notch */}
-        <div className="absolute top-3 left-1/2 -translate-x-1/2 w-[120px] h-9 bg-black rounded-[1.2rem] z-50 flex items-center justify-end px-4">
-          <div className="w-2.5 h-2.5 bg-[#1a1a1a] rounded-full shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)]"></div>
+    <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="relative scale-90 sm:scale-100 origin-center transition-transform">
+        <div className="w-[393px] h-[852px] bg-slate-900 overflow-hidden relative shadow-2xl border-[10px] border-slate-800 rounded-[3.5rem] device-shell">
+          {/* Dynamic Island Notch */}
+          <div className="absolute top-3 left-1/2 -translate-x-1/2 w-[120px] h-9 bg-black rounded-[1.2rem] z-50 flex items-center justify-end px-4">
+            <div className="w-2.5 h-2.5 bg-[#1a1a1a] rounded-full shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)]"></div>
+          </div>
+
+          {/* Side Drawer Overlay */}
+          <AnimatePresence>
+            {drawerOpen && (
+              <>
+                <motion.div 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  onClick={() => setDrawerOpen(false)}
+                  className="absolute inset-0 bg-indigo-dark/60 backdrop-blur-sm z-[100]"
+                />
+                <motion.aside
+                  initial={{ x: '-100%' }}
+                  animate={{ x: 0 }}
+                  exit={{ x: '-100%' }}
+                  transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                  className="absolute left-0 top-0 h-full w-[280px] bg-indigo-dark text-white shadow-2xl z-[101] flex flex-col p-8 pt-16 rounded-r-3xl"
+                >
+                  <div className="flex items-center gap-3 mb-12">
+                    <div className="w-10 h-10 bg-[#ef4444] rounded-xl flex items-center justify-center font-bold text-xl shadow-lg">C</div>
+                    <span className="text-2xl font-bold tracking-tight">My Campus</span>
+                  </div>
+                  <div className="space-y-4 flex-1">
+                    <DrawerItem icon={LayoutDashboard} label="Dashboard" active={screen === 'dashboard'} onClick={() => { setScreen('dashboard'); setDrawerOpen(false); }} />
+                    <DrawerItem icon={Calendar} label="Timetable" active={screen === 'timetable'} onClick={() => { setScreen('timetable'); setDrawerOpen(false); }} />
+                    <DrawerItem icon={Compass} label="Campus Map" active={screen === 'map'} onClick={() => { setScreen('map'); setDrawerOpen(false); }} />
+                    <DrawerItem icon={Users} label="Community" active={screen === 'community'} onClick={() => { setScreen('community'); setDrawerOpen(false); }} />
+                    <DrawerItem icon={User} label="Profile" active={screen === 'profile'} onClick={() => { setScreen('profile'); setDrawerOpen(false); }} />
+                  </div>
+                  
+                  <div className="mt-auto">
+                      <div className="p-5 bg-white/10 rounded-2xl border border-white/10 backdrop-blur-md">
+                        <p className="text-[10px] opacity-60 mb-1 uppercase tracking-widest font-bold">Student ID</p>
+                        <p className="text-sm font-mono text-white/90">#2024-883921</p>
+                      </div>
+                  </div>
+                </motion.aside>
+              </>
+            )}
+          </AnimatePresence>
+
+          <Layout 
+            activeScreen={screen} 
+            setScreen={setScreen} 
+            title={getTitle()} 
+            onMenuClick={() => setDrawerOpen(true)}
+          >
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={screen}
+                initial={{ opacity: 0, x: 10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -10 }}
+                transition={{ duration: 0.2 }}
+                className="h-full"
+              >
+                {renderScreen()}
+              </motion.div>
+            </AnimatePresence>
+          </Layout>
         </div>
 
-        {/* Side Drawer Overlay */}
-        <AnimatePresence>
-          {drawerOpen && (
-            <>
-              <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                onClick={() => setDrawerOpen(false)}
-                className="absolute inset-0 bg-indigo-dark/60 backdrop-blur-sm z-[100]"
-              />
-              <motion.aside
-                initial={{ x: '-100%' }}
-                animate={{ x: 0 }}
-                exit={{ x: '-100%' }}
-                transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                className="absolute left-0 top-0 h-full w-[280px] bg-indigo-dark text-white shadow-2xl z-[101] flex flex-col p-8 pt-16 rounded-r-3xl"
-              >
-                <div className="flex items-center gap-3 mb-12">
-                  <div className="w-10 h-10 bg-[#ef4444] rounded-xl flex items-center justify-center font-bold text-xl shadow-lg">C</div>
-                  <span className="text-2xl font-bold tracking-tight">My Campus</span>
-                </div>
-                <div className="space-y-4 flex-1">
-                  <DrawerItem icon={LayoutDashboard} label="Dashboard" active={screen === 'dashboard'} onClick={() => { setScreen('dashboard'); setDrawerOpen(false); }} />
-                  <DrawerItem icon={Calendar} label="Timetable" active={screen === 'timetable'} onClick={() => { setScreen('timetable'); setDrawerOpen(false); }} />
-                  <DrawerItem icon={Compass} label="Campus Map" active={screen === 'map'} onClick={() => { setScreen('map'); setDrawerOpen(false); }} />
-                  <DrawerItem icon={Users} label="Community" active={screen === 'community'} onClick={() => { setScreen('community'); setDrawerOpen(false); }} />
-                  <DrawerItem icon={User} label="Profile" active={screen === 'profile'} onClick={() => { setScreen('profile'); setDrawerOpen(false); }} />
-                </div>
-                
-                <div className="mt-auto">
-                    <div className="p-5 bg-white/10 rounded-2xl border border-white/10 backdrop-blur-md">
-                      <p className="text-[10px] opacity-60 mb-1 uppercase tracking-widest font-bold">Student ID</p>
-                      <p className="text-sm font-mono text-white/90">#2024-883921</p>
-                    </div>
-                </div>
-              </motion.aside>
-            </>
-          )}
-        </AnimatePresence>
-
-        <Layout 
-          activeScreen={screen} 
-          setScreen={setScreen} 
-          title={getTitle()} 
-          onMenuClick={() => setDrawerOpen(true)}
-        >
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={screen}
-              initial={{ opacity: 0, x: 10 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -10 }}
-              transition={{ duration: 0.2 }}
-              className="h-full"
-            >
-              {renderScreen()}
-            </motion.div>
-          </AnimatePresence>
-        </Layout>
+        {/* Physical Buttons Simulation */}
+        <div className="absolute top-32 -left-3 w-1.5 h-8 bg-slate-800 rounded-r shadow-sm"></div>
+        <div className="absolute top-48 -left-3 w-1.5 h-16 bg-slate-800 rounded-r shadow-sm"></div>
+        <div className="absolute top-68 -left-3 w-1.5 h-16 bg-slate-800 rounded-r shadow-sm"></div>
+        <div className="absolute top-48 -right-3 w-1.5 h-24 bg-slate-800 rounded-l shadow-sm"></div>
       </div>
-
-      {/* Physical Buttons Simulation */}
-      <div className="absolute top-48 -left-3 w-1.5 h-16 bg-slate-800 rounded-r shadow-sm"></div>
-      <div className="absolute top-72 -left-3 w-1.5 h-24 bg-slate-800 rounded-r shadow-sm"></div>
-      <div className="absolute top-72 -right-3 w-1.5 h-24 bg-slate-800 rounded-l shadow-sm"></div>
     </div>
   );
 }
