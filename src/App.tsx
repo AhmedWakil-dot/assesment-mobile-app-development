@@ -240,7 +240,7 @@ const Dashboard = ({ setScreen }: { setScreen: (s: Screen) => void }) => (
     className="p-4 space-y-6"
   >
     {/* Next Class Hero */}
-    <div className="w-full bg-[#4262ff] rounded-3xl overflow-hidden relative shadow-xl shadow-blue-500/30 group cursor-pointer active:scale-[0.99] transition-transform" onClick={() => setScreen('map')}>
+    <div className="w-full bg-[#ef4444] rounded-3xl overflow-hidden relative shadow-xl shadow-red-500/30 group cursor-pointer active:scale-[0.99] transition-transform" onClick={() => setScreen('map')}>
       <div className="absolute -bottom-10 -right-10 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
       <div className="relative z-10 p-8 flex flex-col gap-4">
         <div className="space-y-1">
@@ -253,7 +253,7 @@ const Dashboard = ({ setScreen }: { setScreen: (s: Screen) => void }) => (
             </div>
           </div>
         </div>
-        <button className="bg-white text-[#4262ff] px-6 py-3 rounded-xl font-bold shadow-lg flex items-center justify-center gap-2 group-hover:scale-[1.02] transition-transform">
+        <button className="bg-white text-[#ef4444] px-6 py-3 rounded-xl font-bold shadow-lg flex items-center justify-center gap-2 group-hover:scale-[1.02] transition-transform">
           <span>Open Map</span>
           <ChevronRight className="w-4 h-4" />
         </button>
@@ -268,7 +268,7 @@ const Dashboard = ({ setScreen }: { setScreen: (s: Screen) => void }) => (
       <div className="relative w-32 h-32 flex items-center justify-center">
         <svg className="absolute w-full h-full transform -rotate-90">
           <circle cx="64" cy="64" r="56" stroke="#F1F5F9" strokeWidth="12" fill="transparent" />
-          <circle cx="64" cy="64" r="56" stroke="#4262ff" strokeWidth="12" fill="transparent" strokeDasharray="351.8" strokeDashoffset="28.1" />
+          <circle cx="64" cy="64" r="56" stroke="#ef4444" strokeWidth="12" fill="transparent" strokeDasharray="351.8" strokeDashoffset="28.1" />
         </svg>
         <div className="text-center">
           <span className="text-3xl font-bold text-indigo-dark">92%</span>
@@ -333,8 +333,8 @@ const TimetableScreen = () => (
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{8 + i*2}:00 AM</span>
           </div>
           <div className="relative flex-1 bg-white rounded-3xl p-6 shadow-xl border border-slate-50 overflow-hidden">
-            <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#4262ff]"></div>
-            <span className="text-[10px] font-bold text-[#4262ff] uppercase mb-1 block tracking-wider">Lecture</span>
+            <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#ef4444]"></div>
+            <span className="text-[10px] font-bold text-[#ef4444] uppercase mb-1 block tracking-wider">Lecture</span>
             <h4 className="font-bold text-indigo-dark mb-3 text-lg leading-tight">Computational Mathematics</h4>
             <div className="flex items-center gap-4 text-slate-500 text-xs font-semibold">
               <span className="flex items-center gap-1.5"><DoorOpen className="w-3.5 h-3.5" /> Hall B</span>
@@ -372,9 +372,9 @@ const MapScreen = () => {
           animate={{ scale: 1, opacity: 1 }}
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center"
         >
-          <div className="bg-[#4262ff] text-white p-4 rounded-2xl shadow-2xl relative border-2 border-white">
+          <div className="bg-[#ef4444] text-white p-4 rounded-2xl shadow-2xl relative border-2 border-white">
             <School className="w-8 h-8" />
-            <div className="absolute inset-0 animate-ping bg-[#4262ff] rounded-2xl opacity-30"></div>
+            <div className="absolute inset-0 animate-ping bg-[#ef4444] rounded-2xl opacity-30"></div>
           </div>
           <div className="mt-3 glass px-4 py-2 rounded-xl whitespace-nowrap shadow-xl text-indigo-dark font-bold text-xs">
             BLOCK C • UX DESIGN LAB
@@ -390,14 +390,14 @@ const MapScreen = () => {
               exit={{ opacity: 0, y: 10 }}
               className="absolute top-4 left-4 right-4 glass p-5 rounded-3xl shadow-2xl border border-white/40 z-50"
             >
-              <p className="text-[10px] font-bold text-[#4262ff] mb-1 uppercase tracking-widest">Closest Match</p>
+              <p className="text-[10px] font-bold text-[#ef4444] mb-1 uppercase tracking-widest">Closest Match</p>
               <h4 className="font-bold text-indigo-dark text-lg leading-tight">Main Library (Building A)</h4>
               <p className="text-xs text-slate-500 mt-1 font-medium">2 mins walk • Crowded right now</p>
             </motion.div>
           )}
         </AnimatePresence>
 
-        <button className="absolute bottom-8 right-8 p-5 bg-[#4262ff] rounded-2xl shadow-2xl text-white active:scale-95 transition-transform border-2 border-white">
+        <button className="absolute bottom-8 right-8 p-5 bg-[#ef4444] rounded-2xl shadow-2xl text-white active:scale-95 transition-transform border-2 border-white">
           <MapPin className="w-7 h-7" />
         </button>
       </div>
@@ -442,8 +442,8 @@ const CommunityScreen = ({ setScreen }: { setScreen: (s: Screen) => void }) => (
               <img src="https://picsum.photos/seed/model/600/400" className="w-full h-48 object-cover" />
             </div>
             <div className="flex items-center gap-6 pt-5 border-t border-slate-50">
-              <button className="flex items-center gap-2 text-slate-500 text-xs font-bold hover:text-[#4262ff] transition-colors"><CheckCircle2 className="w-4 h-4" /> 124</button>
-              <button onClick={() => setScreen('community')} className="flex items-center gap-2 text-[#4262ff] text-xs font-bold hover:opacity-80 transition-opacity"><MessageSquare className="w-4 h-4" /> 18</button>
+              <button className="flex items-center gap-2 text-slate-500 text-xs font-bold hover:text-[#ef4444] transition-colors"><CheckCircle2 className="w-4 h-4" /> 124</button>
+              <button onClick={() => setScreen('community')} className="flex items-center gap-2 text-[#ef4444] text-xs font-bold hover:opacity-80 transition-opacity"><MessageSquare className="w-4 h-4" /> 18</button>
             </div>
           </div>
         </div>
@@ -512,12 +512,12 @@ const ProfileScreen = () => (
       ].map((stat, i) => (
         <div key={i} className="flex items-center justify-between p-6 bg-white rounded-3xl shadow-xl border border-slate-50">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-[#4262ff]/10 rounded-2xl text-[#4262ff]">
+            <div className="p-3 bg-[#ef4444]/10 rounded-2xl text-[#ef4444]">
               <stat.icon className="w-6 h-6" />
             </div>
             <span className="font-bold text-indigo-dark text-lg">{stat.label}</span>
           </div>
-          <span className="font-black text-[#4262ff] text-xl">{stat.value}</span>
+          <span className="font-black text-[#ef4444] text-xl">{stat.value}</span>
         </div>
       ))}
     </div>
@@ -609,7 +609,7 @@ export default function App() {
                 className="absolute left-0 top-0 h-full w-[280px] bg-indigo-dark text-white shadow-2xl z-[101] flex flex-col p-8 pt-16 rounded-r-3xl"
               >
                 <div className="flex items-center gap-3 mb-12">
-                  <div className="w-10 h-10 bg-[#4262ff] rounded-xl flex items-center justify-center font-bold text-xl shadow-lg">C</div>
+                  <div className="w-10 h-10 bg-[#ef4444] rounded-xl flex items-center justify-center font-bold text-xl shadow-lg">C</div>
                   <span className="text-2xl font-bold tracking-tight">My Campus</span>
                 </div>
                 <div className="space-y-4 flex-1">
@@ -663,7 +663,7 @@ export default function App() {
 const DrawerItem = ({ icon: Icon, label, active, onClick }: { icon: any, label: string, active?: boolean, onClick: () => void }) => (
   <button 
     onClick={onClick}
-    className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all ${active ? 'bg-primary-container text-white' : 'text-white/60 hover:text-white hover:bg-white/5'}`}
+    className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all ${active ? 'bg-primary-container text-white shadow-lg shadow-red-500/20' : 'text-white/60 hover:text-white hover:bg-white/5'}`}
   >
     <Icon className="w-5 h-5" />
     <span className="font-bold text-sm tracking-tight">{label}</span>
